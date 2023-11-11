@@ -1,3 +1,58 @@
+template<class T>
+class frac{
+    T bunsi,bunbo;
+    constexpr void reduct()noexcept{
+        T g=gcd(bunsi,bunbo);
+        bunsi/=g;bunbo/=g;
+        if(bunbo<0){
+            bunsi=-bunsi;bunbo=-bunbo;
+        }
+    }
+public:
+    constexpr frac(T Bunsi=0,T Bunbo=1)noexcept{
+        bunsi=Bunsi;bunbo=Bunbo;
+        reduct();
+    }
+    constexpr T &Bunsi(){return bunsi;}
+    constexpr T &Bunbo(){return bunbo;}
+    constexpr frac<T>&operator+=(const frac<T>&rhs)noexcept{
+        bunsi=bunsi*rhs.bunbo+bunbo*rhs.bunsi;
+        bunbo*=rhs.bunbo;
+        reduct();
+        return *this;
+    }
+    constexpr frac<T>&operator-=(const frac<T>&rhs)noexcept{
+        bunsi=bunsi*rhs.bunbo-bunbo*rhs.bunsi;
+        bunbo*=rhs.bunbo;
+        reduct();
+        return *this;
+    }
+    constexpr frac<T>&operator*=(const frac<T>&rhs)noexcept{
+        bunbo*=rhs.bunbo;
+        bunsi*=rhs.bunsi;
+        reduct();
+        return *this;
+    }
+    constexpr frac<T>&operator/=(const frac<T>&rhs)noexcept{
+        bunbo*=rhs.bunsi;
+        bunsi*=rhs.bunbo;
+        reduct();
+        return *this;
+    }
+    constexpr frac<T>operator+(const frac<T>&rhs)const noexcept{return frac(*this)+=rhs;}
+    constexpr frac<T>operator-(const frac<T>&rhs)const noexcept{return frac(*this)-=rhs;}
+    constexpr frac<T>operator*(const frac<T>&rhs)const noexcept{return frac(*this)*=rhs;}
+    constexpr frac<T>operator/(const frac<T>&rhs)const noexcept{return frac(*this)/=rhs;}
+    constexpr bool operator<(const frac<T>&rhs)const noexcept{return bunsi*rhs.bunbo<bunbo*rhs.bunsi;}
+    constexpr bool operator>(const frac<T>&rhs)const noexcept{return bunsi*rhs.bunbo>bunbo*rhs.bunsi;}
+    constexpr bool operator>=(const frac<T>&rhs)const noexcept{return bunsi*rhs.bunbo>=bunbo*rhs.bunsi;}
+    constexpr bool operator<=(const frac<T>&rhs)const noexcept{return bunsi*rhs.bunbo<=bunbo*rhs.bunsi;}
+    constexpr bool operator==(const frac<T>&rhs)const noexcept{return bunsi*rhs.bunbo==bunbo*rhs.bunsi;}
+    constexpr bool operator!=(const frac<T>&rhs)const noexcept{return bunsi*rhs.bunbo!=bunbo*rhs.bunsi;}
+};
+
+#define frac frac<int>
+
 struct dsu_equation{
     private:
     vector<int> par;
@@ -73,8 +128,8 @@ struct dsu_equation{
             pair<frac,frac> ly=relationship(y);
             int rx=root(x);
             if(isvaild[rx]){
-                frac cx=a/lx.first+b/ly.first;
-                frac cc=c+a*lx.second/lx.first+b*ly.second/ly.first;
+                frac cx=frac(a)/lx.first+frac(b)/ly.first;
+                frac cc=frac(c)+frac(a)*lx.second/lx.first+frac(b)*ly.second/ly.first;
                 if(cx==0){
                     if(cc==0)return 1;
                     else return 0;
@@ -82,8 +137,8 @@ struct dsu_equation{
                 else if(val[rx]==cc/cx)return 1;
                 else return 0;
             }else{
-                frac cx=a/lx.first+b/ly.first;
-                frac cc=c+a*lx.second/lx.first+b*ly.second/ly.first;
+                frac cx=frac(a)/lx.first+frac(b)/ly.first;
+                frac cc=frac(c)+frac(a)*lx.second/lx.first+frac(b)*ly.second/ly.first;
                 if(cx==0){
                     if(cc==0)return 1;
                     else return 0;
@@ -103,15 +158,15 @@ struct dsu_equation{
         int rx=root(x);
         int ry=root(y);
         if(isvaild[ry]){
-            frac res=(c-b*val[ry]/ly.first+b*ly.second/ly.first+a*lx.second/lx.first)*lx.first/a;
+            frac res=(frac(c)-frac(b)*val[ry]/ly.first+frac(b)*ly.second/ly.first+frac(a)*lx.second/lx.first)*lx.first/a;
             if(isvaild[rx]&&res!=val[rx])return 0;
             isvaild[rx]=true;
             val[rx]=res;
         }
         par[ry]=rx;
         siz[rx]+=siz[ry];
-        coef_x[ry]=(-b*lx.first)/(a*ly.first);
-        coef_c[ry]=(c+b*ly.second/ly.first+a*lx.second/lx.first)*lx.first/a;
+        coef_x[ry]=(frac(-b)*lx.first)/(frac(a)*ly.first);
+        coef_c[ry]=(frac(c)+frac(b)*ly.second/ly.first+frac(a)*lx.second/lx.first)*lx.first/a;
         return 1;
     }
 
@@ -121,7 +176,7 @@ struct dsu_equation{
         if(!isvaild[rx])return make_pair(false,0);
         else{
             frac res=(val[rx]-lx.second)/lx.first;
-            return make_pair(true,res.getNumer());
+            return make_pair(true,res.Bunsi());
         }
     }
     
@@ -133,7 +188,7 @@ struct dsu_equation{
         if(same(x,y)){
             pair<frac,frac> lx=relationship(x),ly=relationship(y);
             frac res=(lx.first*xval+lx.second-ly.second)/ly.first;
-            return make_pair(3,res.getNumer());
+            return make_pair(3,res.Bunsi());
         }else{
             return make_pair(4,0);
         }
