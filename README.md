@@ -1,80 +1,61 @@
 # dsu_equation
 
-WeightedUnionFind木の拡張のようなものです。
-
-$N$ 元 $1$ 次方程式を高速に扱います
-
-分数ライブラリが必要です。別で用意してください。
-
-なお分数のデータ構造をここでは frac と定義します
-
-fracは四則演算と整数型での値の取得する関数 (ここではgetNumber)が使える必要があります
-
-バグ、エラーなどがあったら教えてください
+UnionFind に 一次方程式 をのせます。
+Weighted Union Find の上位互換のようなものです。
+分数ライブラリが必要です。
 
 ## ドキュメント
 
-### `dsu_equation d(N)`
+### `dsu_equation(int N)`
 
-$N$ を初期化します $O(N)$ 時間です
+長さ $N$ の数列 $A$ として初期化します。 $O(N)$ 時間
 
-### `int root(x)`
+### `int leader(int x)`
 
-$x$ の root を返します $O(logN)$ 時間です
+$x$ が含まれるグループのリーダーを返します。$O(\log N)$ 時間
 
+### `int size(int x)`
 
-### `bool same(x,y)`
+$x$ が含まれているグループのサイズを返します。$O(\log N)$ 時間
 
-$A[x],A[y]$ お互いの値が関係しているか
+### `bool same(int x,int y)`
 
-つまり、ある $a$ ( ! = $0$ ), $b$ を用いて $A[x]=a A[y] +b$ と表すことができるかを返します
+$x,y$ が含まれているグループが同じかどうかを返します。 $O(\log N)$ 時間
 
-$O(logN)$ 時間です
+### `tuple<int,frac,frac> relationship(int x,int p=1,int q=0)`
 
+$x$ 含まれているグループのリーダーを $root_x$ としたときに
 
-### `int size(x)`
+$A[root_x]=p\cdot A[x]+q$ と表せられる $p,q$ を求め $root_x,p,q$ を返します。 $O(\log N)$ 時間
 
-$x$ の連結成分のサイズを返します $O(logN)$ 時間です
+### `bool merge(int x,int y,int a,int b,int c)`
 
-### `int d.merge(int x,int y,int a,int b,int c)`
+$a\cdot A[x]+b\cdot A[y]=c$ として $x,y$ をマージします。
 
-$A[x]$ と $A[y]$ を $a A[x] + b A[y] =c$としてmergeします
+矛盾しないなら `true` , しているなら `false` を返します。 $O(\log N)$ 時間
 
-それまでの merge に矛盾していれば $0$ を返しmergeをやめます
+### `bool set_val(int x,frac f)`
 
-矛盾がなければ $1$ を返します
+$A[x] = f$ としてセットします。
 
-$O(log N)$ 時間です
+これまでの情報に矛盾しないなら`true` , しているなら `false` を返します。 $O(\log N)$ 時間 
 
-### `pair<int,int> calc(int x,int y,int v)`
+### `pair<bool,frac> specify(int x)`
 
-$1.$ $A[x]$ , $A[y]$ が元々一意に定まっていれば $1$ $A[y]$
+$A[x]$ の値を求めます。一意に定まらないなら `{false,0}` を返します。
 
-$2.$ $A[y]$ のみが元々一意に定まっていれば $2$ $A[y]$
+そうでないなら `{true,A[x]}` を返します。 $O(\log N)$ 時間
 
-$3.$ $A[x]$ の値によって $A[y]$ が一意に定まるならば $v$ を $A[x]$ に代入して $3$ $A[y]$
+### `tuple<bool,frac,frac> solve_coef(int x,int y)`
 
-$4.$ $A[x]$ の値によって $A[y]$ が一意に定まらない場合は $4$ $0$
+$A[y]=p\cdot A[x]+q$ を満たす $(p,q)$ を返します。
 
-を返します
+一意に定まらないなら `{false,0,0}` を返します。
 
-$O(logN)$ 時間です
+そうでないなら `{true,p,q}` を返します。 $O(\log N)$ 時間
 
-### `pair<frac,frac> relationship(x)`
-
-$x$ の root を $rx$ としたときに $A[rx]=a A[x]+b$
-
-を満たす $a,b$ を返します 
-
-$O(logN)$ 時間です
-
-
-### `pair<bool,int> getval(x)`
-
-$A[x]$ の値が一意に定まっているならば true $A[x]$
-
-そうでなければ false $0$
-
-を返します
-
-$O(logN)$ 時間です
+## verify
+- https://atcoder.jp/contests/abc328/submissions/48274354
+- https://atcoder.jp/contests/abc087/submissions/48274365
+- https://atcoder.jp/contests/typical90/submissions/48274381
+- https://atcoder.jp/contests/abc320/submissions/48274314
